@@ -1,0 +1,11 @@
+.git/
+.secrets
+**/__pycache__/*
+*.gzip
+*.xml
+*.csv
+*.csv.gz
+*.jar
+logs/*
+plugins/udf.zip
+.env
