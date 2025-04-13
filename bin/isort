@@ -1,0 +1,2 @@
+#!/bin/sh
+isort dags plugins tests --profile black -o airflow

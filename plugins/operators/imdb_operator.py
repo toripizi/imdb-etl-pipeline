@@ -5,8 +5,8 @@ import pyspark.sql.functions as F
 from airflow.models import BaseOperator
 from pyspark.sql import DataFrame
 from schemas.imdb_schema import imdb_schema
-from utils.azure_helpers import get_azure_base_path
-from utils.dataframe_helpers import (
+from utils.azure_utils import get_azure_path
+from utils.dataframe_utils import (
     convert_to_int,
     create_map_from_dict,
     explode_key,
@@ -16,9 +16,15 @@ from utils.spark import get_spark_session
 
 
 class ImdbOperator(BaseOperator):
+    """
+    This operator is used to load the IMDB scrapped data from the Azure Data Lake,
+    clean it and transform it into a parquet file.
+    """
+
     def __init__(self, *args, **kwargs):
         super(ImdbOperator, self).__init__(*args, **kwargs)
         self.spark = None
+        self.base_path = None
 
     def setup_spark_session(self, context):
         self.spark = get_spark_session(
@@ -34,18 +40,22 @@ class ImdbOperator(BaseOperator):
 
     def execute(self, context):
         self.setup_spark_session(context)
+        self.setup_azure_base_path(context)
         df = self.load_imdb_data()
         df = self.transform_imdb(df)
         df = self.clean_imdb(df)
         self.write_to_parquet(df)
 
+    def setup_azure_base_path(self, context):
+        self.base_path = get_azure_path(context["ds"])
+        logging.info(f"base path: {self.base_path}")
+
     def load_imdb_data(self) -> DataFrame:
         logging.info("loading imdb data")
-        base_path = get_azure_base_path()
         return (
             self.spark.read.schema(imdb_schema)
             .option("multiline", "true")
-            .json(f"{base_path}/imdb_processed.json")
+            .json(f"{self.base_path}/imdb_processed.json")
         )
 
     def transform_imdb(self, df: DataFrame) -> DataFrame:
@@ -79,6 +89,7 @@ class ImdbOperator(BaseOperator):
         df = convert_to_int(df, "runtime")
 
         logging.info(f"dataframe count: {df.count()}")
+        df = df.where(F.col("title").isNotNull() & F.col("year").isNotNull())
         df = df.drop_duplicates(["title", "year"])
         logging.info(f"dataframe count after droping duplicates: {df.count()}")
 
@@ -108,5 +119,4 @@ class ImdbOperator(BaseOperator):
 
     def write_to_parquet(self, df: DataFrame):
         logging.info("writing imdb data to parquet")
-        base_path = get_azure_base_path()
-        df.write.mode("overwrite").parquet(f"{base_path}/imdb_processed.parquet")
+        df.write.mode("overwrite").parquet(f"{self.base_path}/imdb_processed.parquet")

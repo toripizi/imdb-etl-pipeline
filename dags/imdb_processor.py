@@ -1,9 +1,8 @@
 from datetime import datetime
 
 from airflow import DAG
-from airflow.operators.empty import EmptyOperator
 from operators.imdb_operator import ImdbOperator
-
+from operators.imdb_scraper import ImdbScraperOperator
 
 dag = DAG(
     "imdb_processor",
@@ -12,12 +11,11 @@ dag = DAG(
     schedule="@weekly",
 )
 
-# here should be implemented operator which scrap data from IMDB
-empty_scrapping_operator = EmptyOperator(task_id="empty_scrapping_operator")
+imdb_scrapping_operator = ImdbScraperOperator(dag=dag, task_id="imdb_scrapping_operator")
 
 imdb_operator = ImdbOperator(
     dag=dag,
     task_id="imdb_processor_operator",
 )
 
-empty_scrapping_operator >> imdb_operator
+imdb_scrapping_operator >> imdb_operator

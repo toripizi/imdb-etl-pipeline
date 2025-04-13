@@ -16,14 +16,7 @@ def get_spark_session(job_name, dag_id, spark_conf={}):
 
     conf.setMaster(spark_master_addr)
     conf.setAppName(f"{dag_id}-{job_name}")
-    jars = [
-        f"{os.getenv('SPARK_HOME')}/jars/spark-avro_2.12-3.4.1.jar",
-        f"{os.getenv('SPARK_HOME')}/jars/hadoop-azure-3.3.1.jar",
-    ]
-    conf.set(
-        "spark.jars",
-        ",".join(jars),
-    )
+    conf.set("spark.jars", f"{os.getenv('SPARK_HOME')}/jars/hadoop-azure-3.3.1.jar")
     conf.set("spark.port.maxRetries", 60)
     conf.set("spark.sql.autoBroadcastJoinThreshold", "-1")
     for key, value in spark_conf.items():
