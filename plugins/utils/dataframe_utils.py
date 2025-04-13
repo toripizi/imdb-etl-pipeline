@@ -9,7 +9,7 @@ def convert_to_int(df: DataFrame, column: str) -> DataFrame:
     return df.withColumn(column, F.col(column).cast("int"))
 
 
-def create_map_from_dict(map_dict):
+def create_map_from_dict(map_dict: dict):
     return F.create_map([F.lit(x) for x in itertools.chain(*map_dict.items())])
 
 
