@@ -45,3 +45,11 @@ The pipeline processes movie information including cast, directors, ratings, gen
 The pipeline consists of two main tasks:
 1. `ImdbScraperOperator`: Extracts data from IMDB
 2. `ImdbOperator`: Processes the data with Spark and loads it to Azure
+
+## Important Note on IMDB Data Usage
+
+The `info.txt` file contains information from the official IMDB website regarding data usage policies. Please note that scraping IMDB data is not permitted according to their terms of service. 
+
+However, IMDB provides free datasets for non-commercial use through their IMDb Datasets service. These datasets are updated daily and contain various information about titles, ratings, and more. For production use, it is recommended to use these official datasets instead of scraping.
+
+You can find more information about the official IMDB datasets at: https://developer.imdb.com/non-commercial-datasets/

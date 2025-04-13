@@ -93,10 +93,10 @@ class ImdbOperator(BaseOperator):
         df = df.drop_duplicates(["title", "year"])
         logging.info(f"dataframe count after droping duplicates: {df.count()}")
 
-        df = self.map_categroy(df)
+        df = self.map_category(df)
         return df
 
-    def map_categroy(self, df: DataFrame) -> DataFrame:
+    def map_category(self, df: DataFrame) -> DataFrame:
         logging.info("list all movies category:")
         df.select("kind").drop_duplicates().show(truncate=0)
 

@@ -1,2 +1,2 @@
 #!/bin/sh
-flake8 dags plugins tests --max-line-length=90 # recommended value
+flake8 dags plugins tests --max-line-length=90

@@ -1,2 +1,2 @@
 #!/bin/sh
-black dags plugins tests --line-length 90 # recommended value
+black dags plugins tests --line-length 90
